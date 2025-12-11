@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gograbjob_b2b
+    username: gograbjob
+    password: gograbjob_dev_password
+
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    root: INFO
+    com.platform.talent: DEBUG
+

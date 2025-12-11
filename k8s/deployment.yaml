@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-posting-service
+  namespace: talent-recruitment-cluster
+  labels:
+    app: job-posting-service
+    version: 10.0.0.1
+    component: talent-recruitment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: job-posting-service
+  template:
+    metadata:
+      labels:
+        app: job-posting-service
+        version: 10.0.0.1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8091"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      containers:
+      - name: job-posting-service
+        image: ghcr.io/prod-b2b-ggj-platform/job-posting-service:10.0.0.1
+        ports:
+        - containerPort: 8091
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: talent-recruitment-db-secret
+              key: jdbc-url
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: talent-recruitment-db-secret
+              key: username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: talent-recruitment-db-secret
+              key: password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: talent-recruitment-config
+              key: kafka-bootstrap-servers
+        - name: KERNEL_SERVICE_URL
+          value: "http://kernel-component.kernel-cluster:8080"
+        - name: EMAIL_SERVICE_URL
+          value: "http://business-email-service.framework-cluster:8096"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/jobs/health
+            port: 8091
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8091
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      restartPolicy: Always
+

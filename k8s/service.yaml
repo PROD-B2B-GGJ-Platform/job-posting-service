@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-posting-service
+  namespace: talent-recruitment-cluster
+  labels:
+    app: job-posting-service
+spec:
+  type: ClusterIP
+  selector:
+    app: job-posting-service
+  ports:
+  - name: http
+    port: 8091
+    targetPort: 8091
+    protocol: TCP
+  sessionAffinity: None
+

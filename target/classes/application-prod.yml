@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: job-posting-service
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gograbjob_b2b
+    username: gograbjob
+    password: gograbjob_dev_password
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  
+  flyway:
+    enabled: false
+
+server:
+  port: 8020
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+
+logging:
+  level:
+    root: INFO
+    com.platform.talent: DEBUG
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
